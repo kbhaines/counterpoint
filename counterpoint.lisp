@@ -1,5 +1,14 @@
 
+(defparameter *consonant-intervals* '(0 4 7 12))
+
+(defparameter *notes* '(c1 c1# d1 d1# e1 f1 f1# g1 g1# a1 a1# b1
+                        c2 c2# d2 d2# e2 f2 f2# g2 g2# a2 a2# b2))
+
 (defparameter *melody* '(0 2 1 3 4 5 4 1))
+
+
+(defun notes->nums(notes)
+  (mapcar (lambda (n) (position n *notes*)) notes))
 
 (defun contra-rnd () (loop for i below 8 collect (random 12)))
 
@@ -17,13 +26,15 @@
         for lin in line
         sum (- (abs (- mel lin)))))
 
-(defun score-notes(melody cp-line)
-  (cond ((some (lambda (c) (or (< c 0) (> c 12))) cp-line) -100)
-        (t 0)))
+(defun score-dissonance (melody notes)
+  (loop for mel in melody
+        for note in notes sum(if (member (- mel note) *consonant-intervals*) 0 -5)))
 
+(defun apply-scores(melody p)
+  (mapcar (lambda(f) (funcall f melody p)) '(score-dissonance)))
 
 (defun score-pop(melody popu)
-  (mapcar (lambda (p) (list (+ (score-distance melody p) (score-notes melody p)) p)) popu))
+  (mapcar (lambda (p) (list (apply #'+ (apply-scores melody p)) p)) popu))
 
 (defun clamp (val low high)
   (cond ((< val low) low)
@@ -58,3 +69,9 @@
     (lambda ()
       (setf env-pop (time-step melody env-pop max-pop))
       env-pop)))
+
+(defparameter e ())
+
+(defun get-env()
+  (setq e (environment *melody* *pop* 500)))
+
