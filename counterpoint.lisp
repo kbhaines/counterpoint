@@ -1,16 +1,19 @@
 
 (defparameter *consonant-intervals* '(0 4 7 12))
 
-(defparameter *notes* '(c1 c1# d1 d1# e1 f1 f1# g1 g1# a1 a1# b1
-                        c2 c2# d2 d2# e2 f2 f2# g2 g2# a2 a2# b2))
+(defparameter *notes* '(c1 c#1 d1 d#1 e1 f1 f#1 g1 g#1 a1 a#1 b1
+                        c2 c#2 d2 d#2 e2 f2 f#2 g2 g#2 a2 a#2 b2))
 
-(defparameter *melody* '(0 2 1 3 4 5 4 1))
+(defparameter *melody* '(f#2 e2 d2 a2 f#2 e2 d2 g2))
 
 
 (defun notes->nums(notes)
   (mapcar (lambda (n) (position n *notes*)) notes))
 
-(defun contra-rnd () (loop for i below 8 collect (random 12)))
+(defun nums->notes(nums)
+  (mapcar (lambda (n) (nth n *notes*)) nums))
+
+(defun contra-rnd () (loop for i below 8 collect (random (length *notes*))))
 
 (defparameter *pop* (loop repeat 6 collect (contra-rnd)))
 
@@ -73,5 +76,5 @@
 (defparameter e ())
 
 (defun get-env()
-  (setq e (environment *melody* *pop* 500)))
+  (setq e (environment (notes->nums *melody*) *pop* 500)))
 
